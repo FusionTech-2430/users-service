@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Firebase ###
-spring-firebase-key.json.json
+spring-firebase-key.json
