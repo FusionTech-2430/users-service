@@ -1,56 +1,62 @@
 
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
-
+![Logo](https://github.com/FusionTech-2430/.github/blob/main/profile/Banner2.png?raw=true)
 
 # AllConnected Users Microservice
 
-Microservicio encargado del CRUD de usuarios de la aplicacion AllConnected
-## Tech Stack
+Microservicio encargado del CRUD de usuarios de la aplicación AllConnected
 
-**Client:** React, Redux, TailwindCSS
+---
+## Stack Tecnológico 🛠️
 
-**Server:** Node, Express
+**Servidor:** Springboot
 
+![BD](https://skillicons.dev/icons?i=spring,maven)
 
-## Environment Variables
+**Base de datos:** PostgresQL 
 
-To run this project, you will need to add the following environment variables to your .env file
+![BD](https://skillicons.dev/icons?i=postgresql)
 
-`API_KEY`
+---
+## Variables de Entorno 🔒
 
-`ANOTHER_API_KEY`
+Para ejecutar este proyecto, necesitarás agregar las siguientes variables de entorno a tu archivo .env
 
+`DATASOURCE_URL`
 
-## Run Locally
+`DATASOURCE_USERNAME`
 
-Clone the project
+`DATASOURCE_PASSWORD`
 
-```bash
-  git clone https://link-to-project
-```
+---
+## Ejecutar Localmente 💻
 
-Go to the project directory
-
-```bash
-  cd my-project
-```
-
-Install dependencies
+Clona el proyecto
 
 ```bash
-  npm install
+  git clone https://github.com/FusionTech-2430/users-service
 ```
 
-Start the server
+Ve al directorio del proyecto
 
 ```bash
-  npm run start
+  cd users-service
 ```
 
+Instala las dependencias
 
-## Authors
+```bash
+  mvn install
+```
 
+Inicia el servidor
 
+```bash
+  mvn spring-boot:run
+```
+
+---
+
+## Autores 🧑🏻‍💻
 
 - [@Estebans441](https://www.github.com/Estebans441)
-
+- [@Moyano1711](https://www.github.com/Moyano1711)
