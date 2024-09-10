@@ -1,0 +1,1 @@
+Este archivo es para dejar la estructura de carpetas del proyecto. Eliminar cuando se tenga el proyecto.
