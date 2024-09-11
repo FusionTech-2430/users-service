@@ -1,8 +1,10 @@
 package co.allconnected.fussiontech.usersservice.model;
 
+import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -12,8 +14,19 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "\"user\"", schema = "all_connected_users")
 public class User {
+
+    public User(UserCreateDTO dto){
+        this.fullname = dto.getFullname();
+        this.username = dto.getUsername();
+        this.mail = dto.getMail();
+        this.locationLat = dto.getLocationLat();
+        this.locationLng = dto.getLocationLng();
+        this.active = true;
+    }
+
     @Id
     @Column(name = "id_user", nullable = false, length = 28)
     private String idUser;
