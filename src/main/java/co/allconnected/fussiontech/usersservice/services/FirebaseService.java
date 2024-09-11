@@ -11,9 +11,9 @@ import java.io.InputStream;
 @Service
 public class FirebaseService {
 
-    public void upload(String imageName, MultipartFile imageFile) throws IOException {
+    public void upload(String imageName, String extension, MultipartFile imageFile) throws IOException {
         InputStream inputStream = imageFile.getInputStream();
         Bucket bucket = StorageClient.getInstance().bucket();
-        bucket.create("user_photos/"+imageName, inputStream, "image/*");
+        bucket.create("user_photos/"+imageName, inputStream, "image/"+extension);
     }
 }

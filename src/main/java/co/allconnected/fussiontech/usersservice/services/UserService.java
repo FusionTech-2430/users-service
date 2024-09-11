@@ -2,9 +2,8 @@ package co.allconnected.fussiontech.usersservice.services;
 
 import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
 import co.allconnected.fussiontech.usersservice.model.User;
-import co.allconnected.fussiontech.usersservice.model.Deleted;
 import co.allconnected.fussiontech.usersservice.repository.UserRepository;
-import co.allconnected.fussiontech.usersservice.repository.DeletedRepository;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +29,11 @@ public class UserService {
         user.setIdUser(UUID.randomUUID().toString().substring(0, 28));
 
 
-        String mail = userDto.getMail().replace(".","_");
+        String photoName = userDto.getMail().replace(".","_");
+        String extension = FilenameUtils.getExtension(userDto.getPhoto_url().getOriginalFilename());
+
         try {
-            firebaseService.upload(mail, userDto.getPhoto_url());
+            firebaseService.upload(photoName, extension, userDto.getPhoto_url());
         } catch(IOException e){
             System.out.println(e.getMessage());
         }
