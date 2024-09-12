@@ -6,6 +6,7 @@ import co.allconnected.fussiontech.usersservice.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,7 +22,9 @@ public class UsersController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@ModelAttribute UserCreateDTO user) {
-        return ResponseEntity.ok(userService.createUser(user));
+    public ResponseEntity<User> createUser(
+            @ModelAttribute UserCreateDTO user,
+            @RequestParam(value = "photo", required = false) MultipartFile photo) {
+        return ResponseEntity.ok(userService.createUser(user, photo));
     }
 }

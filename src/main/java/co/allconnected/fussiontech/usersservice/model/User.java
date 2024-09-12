@@ -53,7 +53,11 @@ public class User {
     private Boolean active = false;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany
+    @JoinTable(name = "user_rol",
+            schema = "all_connected_users",
+            joinColumns = @JoinColumn(name = "id_user"),
+            inverseJoinColumns = @JoinColumn(name = "id_rol"))
     private Set<Rol> rols = new LinkedHashSet<>();
 
 }

@@ -18,10 +18,7 @@ public class Rol {
     private String idRol;
 
     @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "user_rol",
-            joinColumns = @JoinColumn(name = "id_rol"),
-            inverseJoinColumns = @JoinColumn(name = "id_user"))
+    @ManyToMany(mappedBy = "rols")
     private Set<User> users = new LinkedHashSet<>();
 
 }
