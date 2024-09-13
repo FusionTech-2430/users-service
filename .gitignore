@@ -34,3 +34,6 @@ build/
 
 ### Firebase ###
 spring-firebase-key.json
+
+### Enviroment variables ###
+.env

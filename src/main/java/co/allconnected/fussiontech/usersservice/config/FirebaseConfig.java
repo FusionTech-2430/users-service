@@ -3,22 +3,36 @@ package co.allconnected.fussiontech.usersservice.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.gson.Gson;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 @Configuration
 public class FirebaseConfig {
 
-    @Bean
+    private final FirebaseConfigProperties firebaseConfigProperties;
+
+    public FirebaseConfig(FirebaseConfigProperties firebaseConfigProperties) {
+        this.firebaseConfigProperties = firebaseConfigProperties;
+    }
+
+    @PostConstruct
     public FirebaseApp initializeFirebase() throws IOException {
-         String serviceAccounPath = System.getProperty("user.dir") + "/spring-firebase-key.json";
-         FileInputStream serviceAccount = new FileInputStream(serviceAccounPath);
+        firebaseConfigProperties.setPrivate_key(
+                firebaseConfigProperties.getPrivate_key().replace("\\n", "\n")
+        );
+
+        String json = new Gson().toJson(firebaseConfigProperties);
+
+        GoogleCredentials credentials = GoogleCredentials.fromStream(new ByteArrayInputStream(json.getBytes()));
 
          FirebaseOptions options = FirebaseOptions.builder()
-                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                 .setCredentials(credentials)
                  .setStorageBucket("allconnected-4855c.appspot.com")
                  .build();
 
