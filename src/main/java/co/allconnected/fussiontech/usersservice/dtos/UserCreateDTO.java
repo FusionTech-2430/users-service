@@ -14,9 +14,7 @@ import java.math.BigDecimal;
 public class UserCreateDTO {
     private String fullname;
     private String username;
+    private String password;
     private String mail;
     private String[] roles;
-    private BigDecimal locationLat;
-    private BigDecimal locationLng;
-    private Boolean active;
 }

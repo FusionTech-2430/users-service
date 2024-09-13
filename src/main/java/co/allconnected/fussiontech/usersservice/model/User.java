@@ -22,8 +22,6 @@ public class User {
         this.fullname = dto.getFullname();
         this.username = dto.getUsername();
         this.mail = dto.getMail();
-        this.locationLat = dto.getLocationLat();
-        this.locationLng = dto.getLocationLng();
         this.active = true;
     }
 
