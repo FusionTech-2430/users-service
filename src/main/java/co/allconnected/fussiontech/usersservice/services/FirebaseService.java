@@ -11,9 +11,15 @@ import java.io.InputStream;
 @Service
 public class FirebaseService {
 
-    public void upload(String imageName, String extension, MultipartFile imageFile) throws IOException {
+    public String upload(String imageName, String extension, MultipartFile imageFile) throws IOException {
         InputStream inputStream = imageFile.getInputStream();
         Bucket bucket = StorageClient.getInstance().bucket();
         bucket.create("user_photos/"+imageName, inputStream, "image/"+extension);
+        return bucket.get("user_photos/"+imageName).signUrl(360, java.util.concurrent.TimeUnit.DAYS).toString();
+    }
+
+    public void delete(String imageName) {
+        Bucket bucket = StorageClient.getInstance().bucket();
+        bucket.get("user_photos/"+imageName).delete();
     }
 }

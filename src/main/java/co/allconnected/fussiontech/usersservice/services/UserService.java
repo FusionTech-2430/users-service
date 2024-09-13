@@ -42,7 +42,7 @@ public class UserService {
         if(photo != null) try {
             String photoName = user.getIdUser();
             String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
-            firebaseService.upload(photoName, extension, photo);
+            user.setPhotoUrl(firebaseService.upload(photoName, extension, photo));
         } catch(IOException e){
             System.out.println(e.getMessage());
         }
