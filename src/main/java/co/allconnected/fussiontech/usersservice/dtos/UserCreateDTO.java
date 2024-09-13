@@ -3,10 +3,6 @@ package co.allconnected.fussiontech.usersservice.dtos;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.annotation.Nullable;
-import java.math.BigDecimal;
 
 @Getter
 @Setter

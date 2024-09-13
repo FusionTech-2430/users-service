@@ -1,7 +1,7 @@
 package co.allconnected.fussiontech.usersservice.dtos;
 
-import co.allconnected.fussiontech.usersservice.model.User;
 import co.allconnected.fussiontech.usersservice.model.Rol;
+import co.allconnected.fussiontech.usersservice.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,6 +1,5 @@
 package co.allconnected.fussiontech.usersservice.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,8 +16,6 @@ public class Rol {
     @Column(name = "id_rol", nullable = false, length = Integer.MAX_VALUE)
     private String idRol;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Set<User> users = new LinkedHashSet<>();
-
 }
