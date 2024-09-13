@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -39,12 +38,6 @@ public class User {
 
     @Column(name = "photo_url", length = 200)
     private String photoUrl;
-
-    @Column(name = "location_lat", precision = 9, scale = 6)
-    private BigDecimal locationLat;
-
-    @Column(name = "location_lng", precision = 9, scale = 6)
-    private BigDecimal locationLng;
 
     @Column(name = "active", nullable = false)
     private Boolean active = false;
