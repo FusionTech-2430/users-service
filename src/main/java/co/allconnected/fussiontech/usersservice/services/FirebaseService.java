@@ -1,6 +1,9 @@
 package co.allconnected.fussiontech.usersservice.services;
 
 import com.google.cloud.storage.Bucket;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,5 +24,14 @@ public class FirebaseService {
     public void delete(String imageName) {
         Bucket bucket = StorageClient.getInstance().bucket();
         bucket.get("user_photos/"+imageName).delete();
+    }
+
+    public String createUser(String email, String password) throws FirebaseAuthException {
+        UserRecord.CreateRequest request = new UserRecord.CreateRequest()
+                .setEmail(email)
+                .setPassword(password);
+
+        UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
+        return userRecord.getUid();
     }
 }

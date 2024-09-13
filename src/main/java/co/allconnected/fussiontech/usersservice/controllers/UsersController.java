@@ -1,14 +1,15 @@
 package co.allconnected.fussiontech.usersservice.controllers;
 
 import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
-import co.allconnected.fussiontech.usersservice.model.User;
+import co.allconnected.fussiontech.usersservice.dtos.UserDTO;
 import co.allconnected.fussiontech.usersservice.services.UserService;
+import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -22,9 +23,9 @@ public class UsersController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(
-            @ModelAttribute UserCreateDTO user,
-            @RequestParam(value = "photo", required = false) MultipartFile photo) {
-        return ResponseEntity.ok(userService.createUser(user, photo));
+    public ResponseEntity<UserDTO> createUser(@ModelAttribute UserCreateDTO user,
+                                              @RequestParam(value = "photo", required = false) MultipartFile photo)
+            throws IOException, FirebaseAuthException {
+        return ResponseEntity.ok(new UserDTO(userService.createUser(user, photo)));
     }
 }

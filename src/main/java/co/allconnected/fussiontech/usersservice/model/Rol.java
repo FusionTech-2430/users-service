@@ -18,7 +18,7 @@ public class Rol {
     private String idRol;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "rols")
+    @ManyToMany(mappedBy = "roles")
     private Set<User> users = new LinkedHashSet<>();
 
 }

@@ -4,13 +4,13 @@ import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
 import co.allconnected.fussiontech.usersservice.model.Rol;
 import co.allconnected.fussiontech.usersservice.model.User;
 import co.allconnected.fussiontech.usersservice.repository.UserRepository;
+import com.google.firebase.auth.FirebaseAuthException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -26,25 +26,23 @@ public class UserService {
         this.rolService = rolService;
     }
 
-    public User createUser(UserCreateDTO userDto, MultipartFile photo) {
+    public User createUser(UserCreateDTO userDto, MultipartFile photo) throws FirebaseAuthException, IOException {
         User user = new User(userDto);
 
-        // Generate user id (TODO: Move to Firebase)
-        user.setIdUser(UUID.randomUUID().toString().substring(0, 28));
+        // Create user in firebase
+        user.setIdUser(firebaseService.createUser(userDto.getMail(), userDto.getPassword()));
 
         // Add roles to user
         for(String rol : userDto.getRoles()){
             Rol rolEntity = rolService.getRol(rol).orElseThrow();
-            user.getRols().add(rolEntity);
+            user.getRoles().add(rolEntity);
         }
 
         // Upload photo to firebase
-        if(photo != null) try {
+        if(photo != null) {
             String photoName = user.getIdUser();
             String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
             user.setPhotoUrl(firebaseService.upload(photoName, extension, photo));
-        } catch(IOException e){
-            System.out.println(e.getMessage());
         }
 
         return userRepository.save(user);

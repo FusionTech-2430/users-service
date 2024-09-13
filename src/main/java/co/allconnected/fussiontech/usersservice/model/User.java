@@ -50,12 +50,11 @@ public class User {
     @Column(name = "active", nullable = false)
     private Boolean active = false;
 
-    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "user_rol",
             schema = "all_connected_users",
             joinColumns = @JoinColumn(name = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_rol"))
-    private Set<Rol> rols = new LinkedHashSet<>();
+    private Set<Rol> roles = new LinkedHashSet<>();
 
 }
