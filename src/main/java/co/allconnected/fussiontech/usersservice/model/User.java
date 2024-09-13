@@ -1,8 +1,9 @@
 package co.allconnected.fussiontech.usersservice.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -12,8 +13,17 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "\"user\"", schema = "all_connected_users")
 public class User {
+
+    public User(UserCreateDTO dto){
+        this.fullname = dto.getFullname();
+        this.username = dto.getUsername();
+        this.mail = dto.getMail();
+        this.active = true;
+    }
+
     @Id
     @Column(name = "id_user", nullable = false, length = 28)
     private String idUser;
@@ -39,8 +49,11 @@ public class User {
     @Column(name = "active", nullable = false)
     private Boolean active = false;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "users")
-    private Set<Rol> rols = new LinkedHashSet<>();
+    @ManyToMany
+    @JoinTable(name = "user_rol",
+            schema = "all_connected_users",
+            joinColumns = @JoinColumn(name = "id_user"),
+            inverseJoinColumns = @JoinColumn(name = "id_rol"))
+    private Set<Rol> roles = new LinkedHashSet<>();
 
 }

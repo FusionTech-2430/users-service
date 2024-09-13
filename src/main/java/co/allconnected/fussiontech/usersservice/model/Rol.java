@@ -1,6 +1,5 @@
 package co.allconnected.fussiontech.usersservice.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,11 +16,6 @@ public class Rol {
     @Column(name = "id_rol", nullable = false, length = Integer.MAX_VALUE)
     private String idRol;
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "user_rol",
-            joinColumns = @JoinColumn(name = "id_rol"),
-            inverseJoinColumns = @JoinColumn(name = "id_user"))
+    @ManyToMany(mappedBy = "roles")
     private Set<User> users = new LinkedHashSet<>();
-
 }

@@ -1,73 +1,50 @@
 package co.allconnected.fussiontech.usersservice.services;
 
 import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
+import co.allconnected.fussiontech.usersservice.model.Rol;
 import co.allconnected.fussiontech.usersservice.model.User;
-import co.allconnected.fussiontech.usersservice.model.Deleted;
 import co.allconnected.fussiontech.usersservice.repository.UserRepository;
-import co.allconnected.fussiontech.usersservice.repository.DeletedRepository;
+import com.google.firebase.auth.FirebaseAuthException;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    // private final DeletedRepository deletedRepository;
+    private final RolService rolService;
+    private final FirebaseService firebaseService;
 
     @Autowired
-    public UserService(UserRepository userRepository, DeletedRepository deletedRepository) {
+    public UserService(UserRepository userRepository, RolService rolService, FirebaseService firebaseService) {
         this.userRepository = userRepository;
-        // this.deletedRepository = deletedRepository;
+        this.firebaseService = firebaseService;
+        this.rolService = rolService;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+    public User createUser(UserCreateDTO userDto, MultipartFile photo) throws FirebaseAuthException, IOException {
+        User user = new User(userDto);
 
-    public User getUserById(String id) {
-        return userRepository.findById(id).orElse(null);
-    }
+        // Create user in firebase
+        user.setIdUser(firebaseService.createUser(userDto.getMail(), userDto.getPassword()));
 
-    public User createUser(UserCreateDTO userDto) {
-        User user = new User();
-        user.setIdUser(UUID.randomUUID().toString().substring(0, 28));
-        user.setUsername(userDto.getUsername());
-        user.setMail(userDto.getMail());
-        user.setFullname(userDto.getFullname());
-        user.setPhotoUrl(userDto.getPhotoUrl());
-        user.setLocationLat(userDto.getLocationLat());
-        user.setLocationLng(userDto.getLocationLng());
-        user.setActive(userDto.getActive());
+        // Add roles to user
+        for(String rol : userDto.getRoles()){
+            Rol rolEntity = rolService.getRol(rol).orElseThrow();
+            user.getRoles().add(rolEntity);
+        }
+
+        // Upload photo to firebase
+        if(photo != null) {
+            String photoName = user.getIdUser();
+            String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
+            user.setPhotoUrl(firebaseService.upload(photoName, extension, photo));
+        }
+
         return userRepository.save(user);
     }
-/*
-    public User updateUser(String id, User user) {
-        User existingUser = getUserById(id);
-        if (existingUser != null) {
-            existingUser.setName(user.getName());
-            existingUser.setEmail(user.getEmail());
-            // Add other fields to be updated
-            return userRepository.save(existingUser);
-        }
-        return null;
-    }
-
-
-    public void deleteUser(String id) {
-        User user = getUserById(id);
-        if (user != null) {
-            Deleted deleted = new Deleted();
-            deleted.setId(user.getId());
-            deleted.setName(user.getName());
-            deleted.setEmail(user.getEmail());
-            // Add other fields to be transferred
-            deletedRepository.save(deleted);
-            userRepository.deleteById(id);
-        }
-    }
-    */
 }
