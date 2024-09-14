@@ -35,10 +35,10 @@ public class UserService {
         User user = new User(userDto);
 
         // Create user in firebase
-        user.setIdUser(firebaseService.createUser(userDto.getMail(), userDto.getPassword()));
+        user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password()));
 
         // Add roles to user
-        for(String rol : userDto.getRoles()){
+        for(String rol : userDto.roles()){
             Rol rolEntity = rolService.getRol(rol).orElseThrow();
             user.getRoles().add(rolEntity);
         }
