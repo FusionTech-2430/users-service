@@ -14,7 +14,7 @@ import java.io.InputStream;
 @Service
 public class FirebaseService {
 
-    public String upload(String imageName, String extension, MultipartFile imageFile) throws IOException {
+    public String uploadImg(String imageName, String extension, MultipartFile imageFile) throws IOException {
         InputStream inputStream = imageFile.getInputStream();
         Bucket bucket = StorageClient.getInstance().bucket();
         bucket.create("user_photos/"+imageName, inputStream, "image/"+extension);
@@ -22,7 +22,7 @@ public class FirebaseService {
                 .signUrl(360, java.util.concurrent.TimeUnit.DAYS).toString();
     }
 
-    public void delete(String imageName) {
+    public void deleteImg(String imageName) {
         Bucket bucket = StorageClient.getInstance().bucket();
         bucket.get("user_photos/"+imageName).delete();
     }
@@ -34,5 +34,23 @@ public class FirebaseService {
 
         UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
         return userRecord.getUid();
+    }
+
+    public void deleteUser(String uid) throws FirebaseAuthException {
+        FirebaseAuth.getInstance().deleteUser(uid);
+    }
+
+    public void disableUser(String uid) throws FirebaseAuthException {
+        UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
+                .setDisabled(true);
+        FirebaseAuth.getInstance().updateUser(request);
+    }
+
+    public void updateUser(String uid, String email, String password) throws FirebaseAuthException {
+        UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
+                .setEmail(email)
+                .setPassword(password);
+
+        FirebaseAuth.getInstance().updateUser(request);
     }
 }

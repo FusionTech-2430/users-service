@@ -1,8 +1,6 @@
 package co.allconnected.fussiontech.usersservice.controllers;
 
-import co.allconnected.fussiontech.usersservice.dtos.ErrorResponse;
-import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
-import co.allconnected.fussiontech.usersservice.dtos.UserDTO;
+import co.allconnected.fussiontech.usersservice.dtos.*;
 import co.allconnected.fussiontech.usersservice.services.UserService;
 import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +29,40 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
         }
         catch (FirebaseAuthException e) {
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Firebase authentication error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Firebase authentication error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Unexpected error occurred: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(
+            @PathVariable String id) {
+        try{
+            userService.deleteUser(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch (RuntimeException e) {
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+
+    }
+
+    @PostMapping("/{id}/deactivate")
+    public ResponseEntity<?> deactivateUser(
+            @PathVariable String id, @RequestBody DeleteRequestDTO deleteRequest) {
+        try{
+            DeletedDTO deletedDTO = userService.deactivateUser(id, deleteRequest.delete_reason());
+            return ResponseEntity.status(HttpStatus.OK).body(deletedDTO);
+        }
+        catch (RuntimeException e) {
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+
     }
 }
 

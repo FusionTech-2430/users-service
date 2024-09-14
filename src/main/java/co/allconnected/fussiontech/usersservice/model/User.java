@@ -17,9 +17,9 @@ import java.util.Set;
 public class User {
 
     public User(UserCreateDTO dto){
-        this.fullname = dto.getFullname();
-        this.username = dto.getUsername();
-        this.mail = dto.getMail();
+        this.fullname = dto.fullname();
+        this.username = dto.username();
+        this.mail = dto.mail();
         this.active = true;
     }
 
@@ -49,4 +49,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "id_rol"))
     private Set<Rol> roles = new LinkedHashSet<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Deleted deleted;
 }
