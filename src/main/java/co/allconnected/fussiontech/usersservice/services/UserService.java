@@ -49,7 +49,7 @@ public class UserService {
     }
 
     public void deleteUser(String id) throws RuntimeException {
-        userRepository.findById(id).ifPresentOrElse(user -> {
+        userRepository.findById(id).ifPresent(user -> {
             if(user.getPhotoUrl() != null)
                 firebaseService.deleteImg(user.getIdUser());
             try {
@@ -58,8 +58,6 @@ public class UserService {
                 throw new RuntimeException("Firebase authentication error: " + e.getMessage());
             }
             userRepository.delete(user);
-        }, () -> {
-            throw new RuntimeException("User not found");
         });
 
         userRepository.deleteById(id);

@@ -44,8 +44,7 @@ public class UsersController {
             @PathVariable String id) {
         try{
             userService.deleteUser(id);
-            Response response = new Response(HttpStatus.NO_CONTENT.value(), "User deleted successfully");
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         catch (RuntimeException e) {
             Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
