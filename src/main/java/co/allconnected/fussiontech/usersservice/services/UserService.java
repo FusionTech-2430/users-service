@@ -42,9 +42,26 @@ public class UserService {
         if(photo != null) {
             String photoName = user.getIdUser();
             String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
-            user.setPhotoUrl(firebaseService.upload(photoName, extension, photo));
+            user.setPhotoUrl(firebaseService.uploadImg(photoName, extension, photo));
         }
 
         return userRepository.save(user);
+    }
+
+    public void deleteUser(String id) throws RuntimeException {
+        userRepository.findById(id).ifPresentOrElse(user -> {
+            if(user.getPhotoUrl() != null)
+                firebaseService.deleteImg(user.getIdUser());
+            try {
+                firebaseService.deleteUser(user.getIdUser());
+            } catch (FirebaseAuthException e) {
+                throw new RuntimeException("Firebase authentication error: " + e.getMessage());
+            }
+            userRepository.delete(user);
+        }, () -> {
+            throw new RuntimeException("User not found");
+        });
+
+        userRepository.deleteById(id);
     }
 }

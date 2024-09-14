@@ -1,6 +1,6 @@
 package co.allconnected.fussiontech.usersservice.controllers;
 
-import co.allconnected.fussiontech.usersservice.dtos.ErrorResponse;
+import co.allconnected.fussiontech.usersservice.dtos.Response;
 import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
 import co.allconnected.fussiontech.usersservice.dtos.UserDTO;
 import co.allconnected.fussiontech.usersservice.services.UserService;
@@ -31,12 +31,27 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
         }
         catch (FirebaseAuthException e) {
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Firebase authentication error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Firebase authentication error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Unexpected error occurred: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(
+            @PathVariable String id) {
+        try{
+            userService.deleteUser(id);
+            Response response = new Response(HttpStatus.NO_CONTENT.value(), "User deleted successfully");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        }
+        catch (RuntimeException e) {
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+
     }
 }
 
