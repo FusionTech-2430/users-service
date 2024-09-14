@@ -39,4 +39,18 @@ public class FirebaseService {
     public void deleteUser(String uid) throws FirebaseAuthException {
         FirebaseAuth.getInstance().deleteUser(uid);
     }
+
+    public void disableUser(String uid) throws FirebaseAuthException {
+        UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
+                .setDisabled(true);
+        FirebaseAuth.getInstance().updateUser(request);
+    }
+
+    public void updateUser(String uid, String email, String password) throws FirebaseAuthException {
+        UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
+                .setEmail(email)
+                .setPassword(password);
+
+        FirebaseAuth.getInstance().updateUser(request);
+    }
 }

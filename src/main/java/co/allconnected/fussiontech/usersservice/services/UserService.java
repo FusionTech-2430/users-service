@@ -1,8 +1,11 @@
 package co.allconnected.fussiontech.usersservice.services;
 
+import co.allconnected.fussiontech.usersservice.dtos.DeletedDTO;
 import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
+import co.allconnected.fussiontech.usersservice.model.Deleted;
 import co.allconnected.fussiontech.usersservice.model.Rol;
 import co.allconnected.fussiontech.usersservice.model.User;
+import co.allconnected.fussiontech.usersservice.repository.DeletedRepository;
 import co.allconnected.fussiontech.usersservice.repository.UserRepository;
 import com.google.firebase.auth.FirebaseAuthException;
 import org.apache.commons.io.FilenameUtils;
@@ -16,14 +19,16 @@ import java.io.IOException;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final DeletedRepository deletedRepository;
     private final RolService rolService;
     private final FirebaseService firebaseService;
 
     @Autowired
-    public UserService(UserRepository userRepository, RolService rolService, FirebaseService firebaseService) {
+    public UserService(UserRepository userRepository, DeletedRepository deletedRepository, RolService rolService, FirebaseService firebaseService) {
         this.userRepository = userRepository;
         this.firebaseService = firebaseService;
         this.rolService = rolService;
+        this.deletedRepository = deletedRepository;
     }
 
     public User createUser(UserCreateDTO userDto, MultipartFile photo) throws FirebaseAuthException, IOException {
@@ -61,5 +66,20 @@ public class UserService {
         });
 
         userRepository.deleteById(id);
+    }
+
+    public DeletedDTO deactivateUser(String id, String reason) throws RuntimeException {
+        return userRepository.findById(id).map(user -> {
+            Deleted deleted = new Deleted(user.getIdUser(), reason);
+            user.setActive(false);
+            user.setDeleted(deletedRepository.save(deleted));
+            userRepository.save(user);
+            try {
+                firebaseService.disableUser(user.getIdUser());
+            } catch (FirebaseAuthException e) {
+                throw new RuntimeException(e);
+            }
+            return new DeletedDTO(deleted.getIdUser(), deleted.getReason(), deleted.getDeleteDate());
+        }).orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

@@ -1,8 +1,6 @@
 package co.allconnected.fussiontech.usersservice.controllers;
 
-import co.allconnected.fussiontech.usersservice.dtos.Response;
-import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
-import co.allconnected.fussiontech.usersservice.dtos.UserDTO;
+import co.allconnected.fussiontech.usersservice.dtos.*;
 import co.allconnected.fussiontech.usersservice.services.UserService;
 import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +43,20 @@ public class UsersController {
         try{
             userService.deleteUser(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch (RuntimeException e) {
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+
+    }
+
+    @PostMapping("/{id}/deactivate")
+    public ResponseEntity<?> deactivateUser(
+            @PathVariable String id, @RequestBody DeleteRequestDTO deleteRequest) {
+        try{
+            DeletedDTO deletedDTO = userService.deactivateUser(id, deleteRequest.delete_reason());
+            return ResponseEntity.status(HttpStatus.OK).body(deletedDTO);
         }
         catch (RuntimeException e) {
             Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());

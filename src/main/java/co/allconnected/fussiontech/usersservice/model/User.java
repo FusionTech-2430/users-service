@@ -49,4 +49,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "id_rol"))
     private Set<Rol> roles = new LinkedHashSet<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Deleted deleted;
 }
