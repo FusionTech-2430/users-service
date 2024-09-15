@@ -1,12 +1,15 @@
 package co.allconnected.fussiontech.usersservice.services;
 
 import co.allconnected.fussiontech.usersservice.dtos.DeletedDTO;
+import co.allconnected.fussiontech.usersservice.dtos.InactiveUserDTO;
 import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
+import co.allconnected.fussiontech.usersservice.dtos.UserDTO;
 import co.allconnected.fussiontech.usersservice.model.Deleted;
 import co.allconnected.fussiontech.usersservice.model.Rol;
 import co.allconnected.fussiontech.usersservice.model.User;
 import co.allconnected.fussiontech.usersservice.repository.DeletedRepository;
 import co.allconnected.fussiontech.usersservice.repository.UserRepository;
+import co.allconnected.fussiontech.usersservice.utils.OperationException;
 import com.google.firebase.auth.FirebaseAuthException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -38,13 +42,13 @@ public class UserService {
         user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password()));
 
         // Add roles to user
-        for(String rol : userDto.roles()){
+        for (String rol : userDto.roles()) {
             Rol rolEntity = rolService.getRol(rol).orElseThrow();
             user.getRoles().add(rolEntity);
         }
 
         // Upload photo to firebase
-        if(photo != null) {
+        if (photo != null) {
             String photoName = user.getIdUser();
             String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
             user.setPhotoUrl(firebaseService.uploadImg(photoName, extension, photo));
@@ -53,22 +57,24 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void deleteUser(String id) throws RuntimeException {
-        userRepository.findById(id).ifPresent(user -> {
-            if(user.getPhotoUrl() != null)
+    public void deleteUser(String id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (user.getPhotoUrl() != null)
                 firebaseService.deleteImg(user.getIdUser());
             try {
                 firebaseService.deleteUser(user.getIdUser());
             } catch (FirebaseAuthException e) {
-                throw new RuntimeException("Firebase authentication error: " + e.getMessage());
+                throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
             }
             userRepository.delete(user);
-        });
-
-        userRepository.deleteById(id);
+        } else {
+            throw new OperationException(404, "User not found");
+        }
     }
 
-    public DeletedDTO deactivateUser(String id, String reason) throws RuntimeException {
+    public DeletedDTO deactivateUser(String id, String reason) {
         return userRepository.findById(id).map(user -> {
             Deleted deleted = new Deleted(user.getIdUser(), reason);
             user.setActive(false);
@@ -77,9 +83,21 @@ public class UserService {
             try {
                 firebaseService.disableUser(user.getIdUser());
             } catch (FirebaseAuthException e) {
-                throw new RuntimeException(e);
+                throw new OperationException(500, e.getMessage());
             }
             return new DeletedDTO(deleted.getIdUser(), deleted.getReason(), deleted.getDeleteDate());
-        }).orElseThrow(() -> new RuntimeException("User not found"));
+        }).orElseThrow(() -> new OperationException(404, "User not found"));
+    }
+
+    public UserDTO[] getUsers(String fullname, String username, String mail, String rol, Boolean active) {
+        return userRepository.findUsersByFilters(fullname, username, mail, rol, active).stream()
+                .map(user -> user.getActive() ? new UserDTO(user) : new InactiveUserDTO(user))
+                .toArray(UserDTO[]::new);
+    }
+
+    public UserDTO getUser(String id) {
+        return userRepository.findById(id)
+                .map(user -> user.getActive() ? new UserDTO(user) : new InactiveUserDTO(user))
+                .orElseThrow(() -> new OperationException(404, "User not found"));
     }
 }
