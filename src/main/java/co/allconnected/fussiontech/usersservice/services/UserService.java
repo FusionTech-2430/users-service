@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -35,7 +36,7 @@ public class UserService {
         this.deletedRepository = deletedRepository;
     }
 
-    public User createUser(UserCreateDTO userDto, MultipartFile photo) throws FirebaseAuthException, IOException {
+    public UserDTO createUser(UserCreateDTO userDto, MultipartFile photo) throws FirebaseAuthException, IOException {
         User user = new User(userDto);
 
         // Create user in firebase
@@ -54,7 +55,21 @@ public class UserService {
             user.setPhotoUrl(firebaseService.uploadImg(photoName, extension, photo));
         }
 
-        return userRepository.save(user);
+        return new UserDTO(userRepository.save(user));
+    }
+
+    public UserDTO createGuestUser(){
+        User user = new User();
+        user.setIdUser(UUID.randomUUID().toString().replace("-", "").substring(0, 28));
+
+        user.setUsername("Guest<" + user.getIdUser() + ">");
+        user.setFullname("Guest");
+        user.setActive(true);
+
+        Rol rolEntity = rolService.getRol("guest").orElseThrow();
+        user.getRoles().add(rolEntity);
+
+        return new UserDTO(userRepository.save(user));
     }
 
     public void deleteUser(String id) {
@@ -63,7 +78,8 @@ public class UserService {
             User user = userOptional.get();
             if (user.getPhotoUrl() != null)
                 firebaseService.deleteImg(user.getIdUser());
-            try {
+            // check if user is guest
+            if (user.getRoles().stream().noneMatch(rol -> rol.getIdRol().equals("guest"))) try {
                 firebaseService.deleteUser(user.getIdUser());
             } catch (FirebaseAuthException e) {
                 throw new OperationException(500, "Firebase authentication error: " + e.getMessage());

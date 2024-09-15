@@ -26,12 +26,22 @@ public class UsersController {
             @ModelAttribute UserCreateDTO user,
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
         try {
-            UserDTO userDTO = new UserDTO(userService.createUser(user, photo));
+            UserDTO userDTO = userService.createUser(user, photo);
             return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
         } catch (FirebaseAuthException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Firebase authentication error: " + e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Unexpected error occurred: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/guest")
+    public  ResponseEntity<?> createGuestUser() {
+        try {
+            UserDTO userDTO = userService.createGuestUser();
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
         }
     }
 
