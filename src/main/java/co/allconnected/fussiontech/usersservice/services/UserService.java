@@ -1,7 +1,9 @@
 package co.allconnected.fussiontech.usersservice.services;
 
 import co.allconnected.fussiontech.usersservice.dtos.DeletedDTO;
+import co.allconnected.fussiontech.usersservice.dtos.InactiveUserDTO;
 import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
+import co.allconnected.fussiontech.usersservice.dtos.UserDTO;
 import co.allconnected.fussiontech.usersservice.model.Deleted;
 import co.allconnected.fussiontech.usersservice.model.Rol;
 import co.allconnected.fussiontech.usersservice.model.User;
@@ -81,5 +83,17 @@ public class UserService {
             }
             return new DeletedDTO(deleted.getIdUser(), deleted.getReason(), deleted.getDeleteDate());
         }).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public UserDTO[] getUsers(String fullname, String username, String mail, String rol, Boolean active) {
+        return userRepository.findUsersByFilters(fullname, username, mail, rol, active).stream()
+                .map(user -> user.getActive() ? new UserDTO(user) : new InactiveUserDTO(user))
+                .toArray(UserDTO[]::new);
+    }
+
+    public UserDTO getUser(String id) {
+        return userRepository.findById(id)
+                .map(user -> user.getActive() ? new UserDTO(user) : new InactiveUserDTO(user))
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

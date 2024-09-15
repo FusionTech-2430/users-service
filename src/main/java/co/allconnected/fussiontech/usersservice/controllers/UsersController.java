@@ -37,6 +37,38 @@ public class UsersController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity<?> getUsers(
+            @RequestParam(value = "fullname", required = false) String fullname,
+            @RequestParam(value = "username", required = false) String username,
+            @RequestParam(value = "mail", required = false) String mail,
+            @RequestParam(value = "rol", required = false) String rol,
+            @RequestParam(value = "active", required = false) Boolean active
+    ) {
+        try{
+            UserDTO[] listUsersDTO = userService.getUsers(fullname, username, mail, rol, active);
+            if (listUsersDTO.length == 0)
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(HttpStatus.NOT_FOUND.value(), "No users found"));
+            return ResponseEntity.status(HttpStatus.OK).body(listUsersDTO);
+        }
+        catch (RuntimeException e) {
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUser(
+            @PathVariable String id) {
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(id));
+        }
+        catch (RuntimeException e) {
+            Response response = new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(
             @PathVariable String id) {
