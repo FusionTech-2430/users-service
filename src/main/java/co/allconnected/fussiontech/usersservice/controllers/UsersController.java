@@ -28,10 +28,10 @@ public class UsersController {
         try {
             UserDTO userDTO = userService.createUser(user, photo);
             return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
-        } catch (FirebaseAuthException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Firebase authentication error: " + e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Unexpected error occurred: " + e.getMessage()));
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
@@ -71,6 +71,21 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(id));
         } catch (OperationException e) {
             return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable String id,
+            @ModelAttribute UserCreateDTO user,
+            @RequestParam(value = "photo", required = false) MultipartFile photo) {
+        try {
+            UserDTO userDTO = userService.updateUser(id, user, photo);
+            return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
