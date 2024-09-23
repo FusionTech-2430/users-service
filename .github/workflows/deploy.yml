@@ -39,7 +39,7 @@ jobs:
             echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_TYPE=${{ secrets.GOOGLE_ADMIN_CONFIG_TYPE }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_PROJECT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PROJECT_ID }}" >> .env
-            echo "GOOGLE_ADMIN_CONFIG_PRIVATE_KEY=\"${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY }}\"" >> .env
+            echo "GOOGLE_ADMIN_CONFIG_PRIVATE_KEY=${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_CLIENT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_ID }}" >> .env
