@@ -82,7 +82,6 @@ Ve al directorio del proyecto
   docker-compose up
 ```
 
-Es importante crear el archivo .env con las variables mencionadas en el punto anterior.
 ---
 
 ## Autores 🧑🏻‍💻
