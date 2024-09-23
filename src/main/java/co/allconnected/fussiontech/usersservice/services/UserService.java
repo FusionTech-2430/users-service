@@ -96,7 +96,7 @@ public class UserService {
             user.setActive(false);
             user.setDeleted(deletedRepository.save(deleted));
             userRepository.save(user);
-            try {
+            if (user.getRoles().stream().noneMatch(rol -> rol.getIdRol().equals("guest"))) try {
                 firebaseService.disableUser(user.getIdUser());
             } catch (FirebaseAuthException e) {
                 throw new OperationException(500, e.getMessage());
