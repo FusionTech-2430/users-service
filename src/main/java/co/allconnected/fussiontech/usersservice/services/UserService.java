@@ -157,4 +157,20 @@ public class UserService {
         }
         return new UserDTO(userRepository.save(user));
     }
+
+    public UserDTO addRoles(String id, String[] roles) {
+        User user = userRepository.findById(id).orElseThrow(() -> new OperationException(404, "User not found"));
+        for (String rol : roles) {
+            Rol rolEntity = rolService.getRol(rol).orElseThrow();
+            user.getRoles().add(rolEntity);
+        }
+        return new UserDTO(userRepository.save(user));
+    }
+
+    public UserDTO removeRoles(String id, String rol) {
+        User user = userRepository.findById(id).orElseThrow(() -> new OperationException(404, "User not found"));
+        Rol rolEntity = rolService.getRol(rol).orElseThrow(() -> new OperationException(404, "Rol not found"));
+        user.getRoles().remove(rolEntity);
+        return new UserDTO(userRepository.save(user));
+    }
 }

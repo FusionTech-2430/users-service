@@ -108,4 +108,24 @@ public class UsersController {
             return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
         }
     }
+
+    @PostMapping("/{id}/roles")
+    public ResponseEntity<?> addRole(@PathVariable String id, @RequestBody RolesDTO roles) {
+        try {
+            UserDTO userDTO = userService.addRoles(id, roles.roles());
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}/roles/{rol}")
+    public ResponseEntity<?> removeRole(@PathVariable String id, @PathVariable String rol) {
+        try {
+            UserDTO userDTO = userService.removeRoles(id, rol);
+            return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        }
+    }
 }
