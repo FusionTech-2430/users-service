@@ -6,7 +6,7 @@ on:
     branches: ["develop"]
   workflow_dispatch:
 jobs:
-  build:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
   deploy:
     name: Deploy on Develop
     runs-on: self-hosted
-    needs: build
+    needs: Build
     steps:
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
