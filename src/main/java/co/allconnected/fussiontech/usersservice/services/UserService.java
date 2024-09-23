@@ -36,11 +36,15 @@ public class UserService {
         this.deletedRepository = deletedRepository;
     }
 
-    public UserDTO createUser(UserCreateDTO userDto, MultipartFile photo) throws FirebaseAuthException, IOException {
+    public UserDTO createUser(UserCreateDTO userDto, MultipartFile photo) {
         User user = new User(userDto);
 
         // Create user in firebase
-        user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password()));
+        try {
+            user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password()));
+        } catch (FirebaseAuthException e) {
+            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+        }
 
         // Add roles to user
         for (String rol : userDto.roles()) {
@@ -52,9 +56,12 @@ public class UserService {
         if (photo != null) {
             String photoName = user.getIdUser();
             String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
-            user.setPhotoUrl(firebaseService.uploadImg(photoName, extension, photo));
+            try{
+                user.setPhotoUrl(firebaseService.uploadImg(photoName, extension, photo));
+            } catch (IOException e) {
+                throw new OperationException(500, "Error uploading photo: " + e.getMessage());
+            }
         }
-
         return new UserDTO(userRepository.save(user));
     }
 
@@ -115,5 +122,39 @@ public class UserService {
         return userRepository.findById(id)
                 .map(user -> user.getActive() ? new UserDTO(user) : new InactiveUserDTO(user))
                 .orElseThrow(() -> new OperationException(404, "User not found"));
+    }
+
+    public UserDTO updateUser(String id, UserCreateDTO userDTO, MultipartFile photo) {
+        User user = userRepository.findById(id).orElseThrow(() -> new OperationException(404, "User not found"));
+
+        if(userDTO.fullname() != null && !user.getFullname().equals(userDTO.fullname()))
+            user.setFullname(userDTO.fullname());
+
+        if(userDTO.username() != null && !user.getUsername().equals(userDTO.username()))
+            user.setUsername(userDTO.username());
+
+        // Update mail and password in firebase if they changed
+        if (userDTO.mail() != null && !user.getMail().equals(userDTO.mail()) || userDTO.password() != null) {
+            try {
+                firebaseService.updateUser(user.getIdUser(), userDTO.mail(), userDTO.password());
+                user.setMail(userDTO.mail());
+            } catch (FirebaseAuthException e) {
+                throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+            }
+        }
+
+        // Update photo if not null
+        if (photo != null) {
+            if (user.getPhotoUrl() != null)
+                firebaseService.deleteImg(user.getIdUser());
+            String photoName = user.getIdUser();
+            String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
+            try{
+                user.setPhotoUrl(firebaseService.uploadImg(photoName, extension, photo));
+            } catch (IOException e) {
+                throw new OperationException(500, "Error uploading photo: " + e.getMessage());
+            }
+        }
+        return new UserDTO(userRepository.save(user));
     }
 }

@@ -47,10 +47,11 @@ public class FirebaseService {
     }
 
     public void updateUser(String uid, String email, String password) throws FirebaseAuthException {
-        UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
-                .setEmail(email)
-                .setPassword(password);
-
+        UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid);
+        if (email != null)
+            request.setEmail(email);
+        if (password != null)
+            request.setPassword(password);
         FirebaseAuth.getInstance().updateUser(request);
     }
 }
