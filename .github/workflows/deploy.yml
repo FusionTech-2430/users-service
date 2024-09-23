@@ -44,6 +44,5 @@ jobs:
             echo "GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_CLIENT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_ID }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_X509_CERT_URL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL }}" >> .env
-            sudo docker run --rm -d -p 8080:8080 --env-file .env users-service
+            sudo docker run -d -p 8080:8080 --env-file .env users-service
             echo "Docker container running..."
-            rm .env
