@@ -8,6 +8,10 @@
 
 name: Deploy Develop
 on:
+  push:
+    branches: ["develop"]
+  pull_request:
+    branches: ["develop"]
   workflow_dispatch:
 jobs:
   deploy:
