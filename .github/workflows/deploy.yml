@@ -24,16 +24,4 @@ jobs:
             git checkout develop
             git pull
             sudo docker build -t users-service .
-            sudo docker run --rm -d \
-                -p 8080:8080 \
-                -e DATASOURCE_URL=${{ secrets.DATASOURCE_URL }} \
-                -e DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }} \
-                -e DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }} \
-                -e GOOGLE_ADMIN_CONFIG_TYPE=${{ secrets.GOOGLE_ADMIN_CONFIG_TYPE }} \
-                -e GOOGLE_ADMIN_CONFIG_PROJECT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PROJECT_ID }} \
-                -e GOOGLE_ADMIN_CONFIG_PRIVATE_KEY="${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY }}" \
-                -e GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID }} \
-                -e GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL }} \
-                -e GOOGLE_ADMIN_CONFIG_CLIENT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_ID }} \
-                -e GOOGLE_ADMIN_CONFIG_X509_CERT_URL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL }} \
-                users-service
+            sudo docker run --rm -d -p 8080:8080 -e DATASOURCE_URL=${{ secrets.DATASOURCE_URL }} -e DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }} -e DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }} -e GOOGLE_ADMIN_CONFIG_TYPE=${{ secrets.GOOGLE_ADMIN_CONFIG_TYPE }} -e GOOGLE_ADMIN_CONFIG_PROJECT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PROJECT_ID }} -e GOOGLE_ADMIN_CONFIG_PRIVATE_KEY="${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY }}" -e GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID }} -e GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL }} -e GOOGLE_ADMIN_CONFIG_CLIENT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_ID }} -e GOOGLE_ADMIN_CONFIG_X509_CERT_URL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL }} users-service
