@@ -66,6 +66,24 @@ Inicia el servidor
 ```
 
 ---
+## Ejecutar con Docker 🐋
+
+```bash
+  git clone https://github.com/FusionTech-2430/users-service
+```
+
+Ve al directorio del proyecto
+
+```bash
+  cd users-service
+```
+
+```bash
+  docker-compose up
+```
+
+Es importante crear el archivo .env con las variables mencionadas en el punto anterior.
+---
 
 ## Autores 🧑🏻‍💻
 
