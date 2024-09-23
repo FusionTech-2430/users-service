@@ -32,7 +32,7 @@ jobs:
             git checkout develop
             git pull
             echo "Building Docker image..."
-            sudo docker build -t users-service .
+            docker build -t users-service .
             echo "Creating .env file..."
             echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> .env
             echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> .env
@@ -44,6 +44,7 @@ jobs:
             echo "GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_CLIENT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_ID }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_X509_CERT_URL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL }}" >> .env
-            sudo docker run -d -p 8080:8080 --env-file .env users-service
+            docker rm -f users-service
+            docker run -d -p 8080:8080 --env-file .env users-service --name users-service
             echo "Docker container running..."
-            
+            rm .env
