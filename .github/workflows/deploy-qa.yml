@@ -33,7 +33,7 @@ jobs:
         run: mvn clean install
 
   deploy:
-    name: Deploy on Develop
+    name: Deploy on QA
     runs-on: self-hosted
     needs: Build
     steps:
