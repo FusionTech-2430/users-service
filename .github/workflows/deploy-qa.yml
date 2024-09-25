@@ -1,4 +1,4 @@
-name: Build
+name: Deploy QA
 on:
   push:
     branches: ["release"]
