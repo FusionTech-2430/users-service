@@ -48,8 +48,9 @@ public class UserService {
 
         // Add roles to user
         for (String rol : userDto.roles()) {
-            Rol rolEntity = rolService.getRol(rol).orElseThrow();
-            user.getRoles().add(rolEntity);
+            Optional<Rol> rolEntity = rolService.getRol(rol);
+            if(rolEntity.isEmpty()) throw new OperationException(404, "Rol not found");
+            user.getRoles().add(rolEntity.get());
         }
 
         // Upload photo to firebase
