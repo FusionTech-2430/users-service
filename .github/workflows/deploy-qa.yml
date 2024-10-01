@@ -64,6 +64,6 @@ jobs:
             echo "GOOGLE_ADMIN_CONFIG_CLIENT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_ID }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_X509_CERT_URL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL }}" >> .env
             docker rm -f ${{ github.event.repository.name }}
-            docker run --name ${{ github.event.repository.name }} --network all_connected -d -p 8080:8080 --env-file .env ${{ github.event.repository.name }}
+            docker run --name ${{ github.event.repository.name }} --network all_connected -d -p ${{ secrets.SERVICE_PORT }}:8080 --env-file .env ${{ github.event.repository.name }}
             echo "Docker container running..."
             rm .env
