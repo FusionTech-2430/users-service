@@ -40,9 +40,9 @@ jobs:
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.QA_HOST }}
+          host: ${{ secrets.QA_G1_HOST }}
           username: ${{ secrets.HOSTS_USERNAME }}
-          key: ${{ secrets.QA_SSH_KEY }}
+          key: ${{ secrets.QA_G1_SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd AllConnected/${{ github.event.repository.name }}
@@ -53,9 +53,9 @@ jobs:
             echo "Building Docker image..."
             docker build -t ${{ github.event.repository.name }} .
             echo "Creating .env file..."
-            echo "DATASOURCE_URL=${{ secrets.QA_DATASOURCE_URL }}/${{ secrets.DB_NAME }}" >> .env
-            echo "DATASOURCE_USERNAME=${{ secrets.QA_DATASOURCE_USERNAME }}" >> .env
-            echo "DATASOURCE_PASSWORD=${{ secrets.QA_DATASOURCE_PASSWORD }}" >> .env
+            echo "DATASOURCE_URL=${{ secrets.QA_G1_DATASOURCE_URL }}/${{ secrets.DB_NAME }}" >> .env
+            echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> .env
+            echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_TYPE=${{ secrets.GOOGLE_ADMIN_CONFIG_TYPE }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_PROJECT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PROJECT_ID }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_PRIVATE_KEY=${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY }}" >> .env
