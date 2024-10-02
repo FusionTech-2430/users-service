@@ -53,7 +53,7 @@ jobs:
             echo "Building Docker image..."
             docker build -t ${{ github.event.repository.name }} .
             echo "Creating .env file..."
-            echo "DATASOURCE_URL=${{ secrets.QA_G1_DATASOURCE_URL }}/${{ secrets.DB_NAME }}" >> .env
+            echo "DATASOURCE_URL=${{ secrets.QA_DATASOURCE_G1_URL }}/${{ secrets.DB_NAME }}" >> .env
             echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> .env
             echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> .env
             echo "GOOGLE_ADMIN_CONFIG_TYPE=${{ secrets.GOOGLE_ADMIN_CONFIG_TYPE }}" >> .env
