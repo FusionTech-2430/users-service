@@ -1,26 +1,8 @@
-
 spring:
   application:
     name: users-service
-  datasource:
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-eureka:
-  client:
-    enabled: false
+  
+  config:
+    import: configserver:http://10.43.101.114:8888
 
-firebase:
-  type: ${GOOGLE_ADMIN_CONFIG_TYPE}
-  project-id: ${GOOGLE_ADMIN_CONFIG_PROJECT_ID}
-  private-key: ${GOOGLE_ADMIN_CONFIG_PRIVATE_KEY}
-  private-key-id: ${GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID}
-  client-email: ${GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL}
-  client-id: ${GOOGLE_ADMIN_CONFIG_CLIENT_ID}
-  auth-uri: https://accounts.google.com/o/oauth2/auth
-  token-uri: https://oauth2.googleapis.com/token
-  auth-provider-x509-cert-url: https://www.googleapis.com/oauth2/v1/certs
-  client-x509-cert-url: ${GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL}
-  universe-domain: googleapis.com
 
