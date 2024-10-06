@@ -1,8 +1,7 @@
 spring:
   application:
     name: users-service
-  cloud:
-    config:
-      uri: configserver:http://${CONFIG_IP}:8888
-      profile: ${PROFILE:dev}
-      
+  config:
+    import: configserver:http://${CONFIG_IP}:8888
+  profiles:
+    active: ${PROFILE:dev}
