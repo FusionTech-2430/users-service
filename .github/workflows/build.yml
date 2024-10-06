@@ -6,7 +6,7 @@ on:
     branches: [ "main", "develop", "release" ]
 
 jobs:
-  Build:
+  Build: 
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
