@@ -1,13 +1,15 @@
 name: Deploy Develop
 on:
-  push:
-    branches: ["develop"]
   pull_request:
-    branches: ["develop"]
+    branches:
+      - develop
+    types:
+      - closed
   workflow_dispatch:
 jobs:
-  deploy:
+  Deploy:
     name: Deploy on Develop
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: self-hosted
     steps:
       - name: executing remote ssh commands using ssh key

@@ -1,13 +1,15 @@
 name: Deploy QA
 on:
-  push:
-    branches: ["release"]
   pull_request:
-    branches: ["release"]
+    branches:
+      - release
+    types:
+      - closed
   workflow_dispatch:
 jobs:
-  deploy:
+  Deploy:
     name: Deploy on QA
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: self-hosted
     steps:
       - name: executing remote ssh commands using ssh key
