@@ -2,7 +2,8 @@ name: Build Project
 on:
   pull_request:
     branches: [ "main", "develop", "release" ]
-
+  push:
+    branches: [ "main", "develop", "release" ]
 jobs:
   Build:
     runs-on: self-hosted
