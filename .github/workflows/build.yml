@@ -19,4 +19,6 @@ jobs:
           cache: maven
 
       - name: Build with Maven
+        env:
+          CONFIG_IP: ${{ secrets.DEV_INTEG_HOST }}
         run: mvn clean install
