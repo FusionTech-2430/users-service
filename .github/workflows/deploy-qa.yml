@@ -1,27 +1,27 @@
-name: Deploy Develop
+name: Deploy QA
 on:
   push:
-    branches: ["develop"]
+    branches: ["release"]
   pull_request:
-    branches: ["develop"]
+    branches: ["release"]
   workflow_dispatch:
 jobs:
   deploy:
-    name: Deploy on Develop
+    name: Deploy on QA
     runs-on: self-hosted
     steps:
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DEV_HOST }}
+          host: ${{ secrets.QA_G1_HOST }}
           username: ${{ secrets.HOSTS_USERNAME }}
-          key: ${{ secrets.DEV_SSH_KEY }}
+          key: ${{ secrets.QA_G1_SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd AllConnected/${{ github.event.repository.name }}
             echo "Fetching latest code..."
             git fetch
-            git checkout develop
+            git checkout release
             git pull
             echo "Building Docker image..."
             docker build -t ${{ github.event.repository.name }} .
