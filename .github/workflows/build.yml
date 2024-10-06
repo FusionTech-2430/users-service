@@ -1,7 +1,5 @@
 name: Build Project
 on:
-  push:
-    branches: [ "main", "develop", "release" ]
   pull_request:
     branches: [ "main", "develop", "release" ]
 
