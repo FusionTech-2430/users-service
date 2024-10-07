@@ -54,8 +54,6 @@ public class UsersController {
     ) {
         try {
             UserDTO[] listUsersDTO = userService.getUsers(fullname, username, mail, rol, active);
-            if (listUsersDTO.length == 0)
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(HttpStatus.NOT_FOUND.value(), "No users found"));
             return ResponseEntity.status(HttpStatus.OK).body(listUsersDTO);
         } catch (OperationException e) {
             return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
