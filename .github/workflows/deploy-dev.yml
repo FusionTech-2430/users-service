@@ -1,41 +1,16 @@
 name: Deploy Develop
 on:
-  push:
-    branches: ["develop"]
   pull_request:
-    branches: ["develop"]
+    branches:
+      - develop
+    types:
+      - closed
   workflow_dispatch:
 jobs:
-  Build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Maven
-        run: sudo apt-get install -y maven
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: "21"
-          distribution: "temurin"
-          cache: maven
-      - name: Build with Maven
-        env:
-          DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
-          DATASOURCE_URL: ${{ secrets.NEON_DATASOURCE_URL }}/${{ secrets.DB_NAME }}
-          DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
-          GOOGLE_ADMIN_CONFIG_TYPE: ${{ secrets.GOOGLE_ADMIN_CONFIG_TYPE }}
-          GOOGLE_ADMIN_CONFIG_PROJECT_ID: ${{ secrets.GOOGLE_ADMIN_CONFIG_PROJECT_ID }}
-          GOOGLE_ADMIN_CONFIG_PRIVATE_KEY: ${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY }}
-          GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID: ${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID }}
-          GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL: ${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL }}
-          GOOGLE_ADMIN_CONFIG_CLIENT_ID: ${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_ID }}
-          GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL: ${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL }}
-        run: mvn clean install
-
-  deploy:
+  Deploy:
     name: Deploy on Develop
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: self-hosted
-    needs: Build
     steps:
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
@@ -53,16 +28,8 @@ jobs:
             echo "Building Docker image..."
             docker build -t ${{ github.event.repository.name }} .
             echo "Creating .env file..."
-            echo "DATASOURCE_URL=${{ secrets.DEV_DATASOURCE_URL }}/${{ secrets.DB_NAME }}" >> .env
-            echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> .env
-            echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> .env
-            echo "GOOGLE_ADMIN_CONFIG_TYPE=${{ secrets.GOOGLE_ADMIN_CONFIG_TYPE }}" >> .env
-            echo "GOOGLE_ADMIN_CONFIG_PROJECT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PROJECT_ID }}" >> .env
-            echo "GOOGLE_ADMIN_CONFIG_PRIVATE_KEY=${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY }}" >> .env
-            echo "GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_PRIVATE_KEY_ID }}" >> .env
-            echo "GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_EMAIL }}" >> .env
-            echo "GOOGLE_ADMIN_CONFIG_CLIENT_ID=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_ID }}" >> .env
-            echo "GOOGLE_ADMIN_CONFIG_X509_CERT_URL=${{ secrets.GOOGLE_ADMIN_CONFIG_CLIENT_X509_CERT_URL }}" >> .env
+            echo "PROFILE=dev" >> .env
+            echo "CONFIG_IP=10.43.101.114" >> .env
             docker rm -f ${{ github.event.repository.name }}
             docker run --name ${{ github.event.repository.name }} --network all_connected -d -p ${{ secrets.SERVICE_PORT }}:8080 --env-file .env ${{ github.event.repository.name }}
             echo "Docker container running..."
