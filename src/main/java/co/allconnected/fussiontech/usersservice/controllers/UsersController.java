@@ -71,6 +71,7 @@ public class UsersController {
         }
     }
 
+    @CrossOrigin
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(
             @PathVariable String id,
