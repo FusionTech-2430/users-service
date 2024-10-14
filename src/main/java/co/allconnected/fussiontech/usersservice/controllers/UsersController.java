@@ -71,15 +71,17 @@ public class UsersController {
         }
     }
 
-    @CrossOrigin
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(
             @PathVariable String id,
             @ModelAttribute UserCreateDTO user,
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
         try {
+            System.out.println("Actualizando usuario");
             UserDTO userDTO = userService.updateUser(id, user, photo);
-            return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+            ResponseEntity<UserDTO> response = ResponseEntity.status(HttpStatus.OK).body(userDTO);
+            System.out.println(response.getHeaders());
+            return response;
         } catch (OperationException e) {
             return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
         } catch (RuntimeException e) {
