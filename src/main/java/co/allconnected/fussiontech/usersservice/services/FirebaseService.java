@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class FirebaseService {
@@ -27,12 +29,16 @@ public class FirebaseService {
         bucket.get("user_photos/"+imageName).delete();
     }
 
-    public String createUser(String email, String password) throws FirebaseAuthException {
+    public String createUser(String email, String password, String[] roles) throws FirebaseAuthException {
         UserRecord.CreateRequest request = new UserRecord.CreateRequest()
                 .setEmail(email)
                 .setPassword(password);
-
+        Map<String, Object> claims = new HashMap<>();
+        for(String rol : roles) {
+            claims.put(rol, true);
+        }
         UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
+        FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), claims);
         return userRecord.getUid();
     }
 

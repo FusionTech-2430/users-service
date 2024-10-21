@@ -41,7 +41,7 @@ public class UserService {
 
         // Create user in firebase
         try {
-            user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password()));
+            user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password(), userDto.roles()));
         } catch (FirebaseAuthException e) {
             throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
         }
