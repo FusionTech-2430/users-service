@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,10 +34,12 @@ public class FirebaseService {
         UserRecord.CreateRequest request = new UserRecord.CreateRequest()
                 .setEmail(email)
                 .setPassword(password);
+
+        // Add custom claims
         Map<String, Object> claims = new HashMap<>();
-        for(String rol : roles) {
-            claims.put(rol, true);
-        }
+        Arrays.stream(roles).forEach(role -> claims.put(role, true));
+
+        // Create user and set custom claims
         UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
         FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), claims);
         return userRecord.getUid();
@@ -59,5 +62,9 @@ public class FirebaseService {
         if (password != null)
             request.setPassword(password);
         FirebaseAuth.getInstance().updateUser(request);
+    }
+
+    public void updateCustomClaims(String uid, Map<String, Object> claims) throws FirebaseAuthException {
+        FirebaseAuth.getInstance().setCustomUserClaims(uid, claims);
     }
 }

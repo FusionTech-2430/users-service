@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -165,13 +167,35 @@ public class UserService {
             Rol rolEntity = rolService.getRol(rol).orElseThrow();
             user.getRoles().add(rolEntity);
         }
+
+        // Update custom claims in firebase
+        Map<String, Object> claims = user.getRoles().stream()
+                .collect(Collectors.toMap(Rol::getIdRol, rol -> true));
+
+        try {
+            firebaseService.updateCustomClaims(user.getIdUser(), claims);
+        } catch (FirebaseAuthException e) {
+            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+        }
+
         return new UserDTO(userRepository.save(user));
     }
 
-    public UserDTO removeRoles(String id, String rol) {
+    public UserDTO removeRoles(String id, String role) {
         User user = userRepository.findById(id).orElseThrow(() -> new OperationException(404, "User not found"));
-        Rol rolEntity = rolService.getRol(rol).orElseThrow(() -> new OperationException(404, "Rol not found"));
+        Rol rolEntity = rolService.getRol(role).orElseThrow(() -> new OperationException(404, "Rol not found"));
         user.getRoles().remove(rolEntity);
-        return new UserDTO(userRepository.save(user));
+        user = userRepository.save(user);
+
+        // Update custom claims in firebase
+        Map<String, Object> claims = user.getRoles().stream()
+                .collect(Collectors.toMap(Rol::getIdRol, rol -> true));
+        try {
+            firebaseService.updateCustomClaims(user.getIdUser(), claims);
+        } catch (FirebaseAuthException e) {
+            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+        }
+
+        return new UserDTO(user);
     }
 }
