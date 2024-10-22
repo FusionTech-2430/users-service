@@ -37,7 +37,7 @@ public class FirebaseService {
 
         // Add custom claims
         Map<String, Object> claims = new HashMap<>();
-        Arrays.stream(roles).forEach(role -> claims.put(role, true));
+        claims.put("roles", roles);
 
         // Create user and set custom claims
         UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
@@ -64,7 +64,8 @@ public class FirebaseService {
         FirebaseAuth.getInstance().updateUser(request);
     }
 
-    public void updateCustomClaims(String uid, Map<String, Object> claims) throws FirebaseAuthException {
-        FirebaseAuth.getInstance().setCustomUserClaims(uid, claims);
-    }
+    public void updateCustomClaims(String uid, String[] roles) throws FirebaseAuthException {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", roles);
+        FirebaseAuth.getInstance().setCustomUserClaims(uid, claims);    }
 }

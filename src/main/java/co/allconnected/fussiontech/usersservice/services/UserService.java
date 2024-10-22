@@ -169,11 +169,8 @@ public class UserService {
         }
 
         // Update custom claims in firebase
-        Map<String, Object> claims = user.getRoles().stream()
-                .collect(Collectors.toMap(Rol::getIdRol, rol -> true));
-
         try {
-            firebaseService.updateCustomClaims(user.getIdUser(), claims);
+            firebaseService.updateCustomClaims(user.getIdUser(), roles);
         } catch (FirebaseAuthException e) {
             throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
         }
@@ -188,10 +185,12 @@ public class UserService {
         user = userRepository.save(user);
 
         // Update custom claims in firebase
-        Map<String, Object> claims = user.getRoles().stream()
-                .collect(Collectors.toMap(Rol::getIdRol, rol -> true));
+        String[] roles = user.getRoles().stream()
+                .map(Rol::getIdRol)
+                .toArray(String[]::new);
+
         try {
-            firebaseService.updateCustomClaims(user.getIdUser(), claims);
+            firebaseService.updateCustomClaims(user.getIdUser(), roles);
         } catch (FirebaseAuthException e) {
             throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
         }
