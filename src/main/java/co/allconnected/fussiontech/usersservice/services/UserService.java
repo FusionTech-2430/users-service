@@ -38,18 +38,10 @@ public class UserService {
         this.deletedRepository = deletedRepository;
     }
 
-    public UserDTO createUser(UserCreateDTO userDto, MultipartFile photo) {
+    public UserDTO createUser(UserDTO userDto, MultipartFile photo) {
         User user = new User(userDto);
-
-        // Create user in firebase
-        try {
-            user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password(), userDto.roles()));
-        } catch (FirebaseAuthException e) {
-            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
-        }
-
         // Add roles to user
-        for (String rol : userDto.roles()) {
+        for (String rol : userDto.getRoles()) {
             Optional<Rol> rolEntity = rolService.getRol(rol);
             if(rolEntity.isEmpty()) throw new OperationException(404, "Rol not found");
             user.getRoles().add(rolEntity.get());
