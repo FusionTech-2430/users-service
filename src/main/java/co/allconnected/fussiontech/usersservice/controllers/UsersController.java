@@ -22,7 +22,7 @@ public class UsersController {
 
     @PostMapping
     public ResponseEntity<?> createUser(
-            @ModelAttribute UserCreateDTO user,
+            @ModelAttribute UserDTO user,
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
         try {
             UserDTO userDTO = userService.createUser(user, photo);
