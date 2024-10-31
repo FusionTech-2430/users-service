@@ -34,6 +34,20 @@ public class UsersController {
         }
     }
 
+    @PostMapping("/from-admin")
+    public ResponseEntity<?> createUserFromAdmin(
+            @ModelAttribute UserCreateDTO user,
+            @RequestParam(value = "photo", required = false) MultipartFile photo) {
+        try {
+            UserDTO userDTO = userService.createUserFromAdmin(user, photo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
     @PostMapping("/guest")
     public  ResponseEntity<?> createGuestUser() {
         try {

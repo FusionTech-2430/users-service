@@ -5,3 +5,6 @@ spring:
     import: configserver:http://${CONFIG_IP:localhost}:8888
   profiles:
     active: ${PROFILE:keveldev}
+
+server:
+    port: 8081

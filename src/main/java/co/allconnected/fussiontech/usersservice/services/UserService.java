@@ -60,6 +60,36 @@ public class UserService {
         return new UserDTO(userRepository.save(user));
     }
 
+    public UserDTO createUserFromAdmin(UserCreateDTO userDto, MultipartFile photo) {
+        User user = new User(userDto);
+
+        // Create user in firebase
+        try {
+            user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password(), userDto.roles()));
+        } catch (FirebaseAuthException e) {
+            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+        }
+
+        // Add roles to user
+        for (String rol : userDto.roles()) {
+            Optional<Rol> rolEntity = rolService.getRol(rol);
+            if(rolEntity.isEmpty()) throw new OperationException(404, "Rol not found");
+            user.getRoles().add(rolEntity.get());
+        }
+
+        // Upload photo to firebase
+        if (photo != null) {
+            String photoName = user.getIdUser();
+            String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
+            try{
+                user.setPhotoUrl(firebaseService.uploadImg(photoName, extension, photo));
+            } catch (IOException e) {
+                throw new OperationException(500, "Error uploading photo: " + e.getMessage());
+            }
+        }
+        return new UserDTO(userRepository.save(user));
+    }
+
     public UserDTO createGuestUser(){
         User user = new User();
         user.setIdUser(UUID.randomUUID().toString().replace("-", "").substring(0, 28));
