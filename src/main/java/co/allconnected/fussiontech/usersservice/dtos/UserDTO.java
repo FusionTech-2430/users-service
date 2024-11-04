@@ -16,7 +16,6 @@ public class UserDTO {
     private String mail;
     private String photo_url;
     private String[] roles;
-    private String[] organizations;
     private boolean active;
 
     public UserDTO(User user){
@@ -26,7 +25,6 @@ public class UserDTO {
         this.mail = user.getMail();
         this.photo_url = user.getPhotoUrl();
         this.roles = user.getRoles().stream().map(Rol::getIdRol).toArray(String[]::new);
-        // this.organizations = user.getOrganizations().stream().map(Organization::getIdOrganization).toArray(String[]::new);
         this.active = user.getActive();
     }
 }
