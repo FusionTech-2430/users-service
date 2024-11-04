@@ -123,6 +123,16 @@ public class UsersController {
         }
     }
 
+    @PostMapping("/{id}/activate")
+    public ResponseEntity<?> activateUser(@PathVariable String id) {
+        try {
+            UserDTO user = userService.activateUser(id);
+            return ResponseEntity.status(HttpStatus.OK).body(user);
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        }
+    }
+
     @PostMapping("/{id}/roles")
     public ResponseEntity<?> addRole(@PathVariable String id, @RequestBody RolesDTO roles) {
         try {

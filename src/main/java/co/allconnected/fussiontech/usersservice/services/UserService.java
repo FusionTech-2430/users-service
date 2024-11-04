@@ -137,6 +137,20 @@ public class UserService {
         }).orElseThrow(() -> new OperationException(404, "User not found"));
     }
 
+    public UserDTO activateUser(String id){
+        return userRepository.findById(id).map(user -> {
+            user.setActive(true);
+            user.setDeleted(null);
+            userRepository.save(user);
+            if (user.getRoles().stream().noneMatch(rol -> rol.getIdRol().equals("guest"))) try {
+                firebaseService.enableUser(user.getIdUser());
+            } catch (FirebaseAuthException e) {
+                throw new OperationException(500, e.getMessage());
+            }
+            return new UserDTO(user);
+        }).orElseThrow(() -> new OperationException(404, "User not found"));
+    }
+
     public UserDTO[] getUsers(String fullname, String username, String mail, String rol, Boolean active) {
         return userRepository.findUsersByFilters(fullname, username, mail, rol, active).stream()
                 .map(user -> user.getActive() ? new UserDTO(user) : new InactiveUserDTO(user))

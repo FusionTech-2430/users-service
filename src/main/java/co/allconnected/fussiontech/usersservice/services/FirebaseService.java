@@ -55,6 +55,12 @@ public class FirebaseService {
         FirebaseAuth.getInstance().updateUser(request);
     }
 
+    public void enableUser(String uid) throws FirebaseAuthException {
+        UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
+                .setDisabled(false);
+        FirebaseAuth.getInstance().updateUser(request);
+    }
+
     public void updateUser(String uid, String email, String password) throws FirebaseAuthException {
         UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid);
         if (email != null)
