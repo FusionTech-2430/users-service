@@ -1,6 +1,7 @@
 package co.allconnected.fussiontech.usersservice.model;
 
 import co.allconnected.fussiontech.usersservice.dtos.UserCreateDTO;
+import co.allconnected.fussiontech.usersservice.dtos.UserDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,15 @@ public class User {
         this.fullname = dto.fullname();
         this.username = dto.username();
         this.mail = dto.mail();
+        this.active = true;
+    }
+
+    public User(UserDTO dto){
+        this.idUser = dto.getId_user();
+        this.fullname = dto.getFullname();
+        this.username = dto.getUsername();
+        this.mail = dto.getMail();
+        this.photoUrl = dto.getMail();
         this.active = true;
     }
 

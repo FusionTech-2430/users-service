@@ -22,10 +22,24 @@ public class UsersController {
 
     @PostMapping
     public ResponseEntity<?> createUser(
-            @ModelAttribute UserCreateDTO user,
+            @ModelAttribute UserDTO user,
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
         try {
             UserDTO userDTO = userService.createUser(user, photo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @PostMapping("/from-admin")
+    public ResponseEntity<?> createUserFromAdmin(
+            @ModelAttribute UserCreateDTO user,
+            @RequestParam(value = "photo", required = false) MultipartFile photo) {
+        try {
+            UserDTO userDTO = userService.createUserFromAdmin(user, photo);
             return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
         } catch (OperationException e) {
             return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
@@ -77,8 +91,11 @@ public class UsersController {
             @ModelAttribute UserCreateDTO user,
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
         try {
+            System.out.println("Actualizando usuario");
             UserDTO userDTO = userService.updateUser(id, user, photo);
-            return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+            ResponseEntity<UserDTO> response = ResponseEntity.status(HttpStatus.OK).body(userDTO);
+            System.out.println(response.getHeaders());
+            return response;
         } catch (OperationException e) {
             return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
         } catch (RuntimeException e) {
@@ -101,6 +118,16 @@ public class UsersController {
         try {
             DeletedDTO deletedDTO = userService.deactivateUser(id, deleteRequest.delete_reason());
             return ResponseEntity.status(HttpStatus.OK).body(deletedDTO);
+        } catch (OperationException e) {
+            return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/activate")
+    public ResponseEntity<?> activateUser(@PathVariable String id) {
+        try {
+            UserDTO user = userService.activateUser(id);
+            return ResponseEntity.status(HttpStatus.OK).body(user);
         } catch (OperationException e) {
             return ResponseEntity.status(e.getCode()).body(new Response(e.getCode(), e.getMessage()));
         }

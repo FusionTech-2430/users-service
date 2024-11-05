@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -36,12 +38,41 @@ public class UserService {
         this.deletedRepository = deletedRepository;
     }
 
-    public UserDTO createUser(UserCreateDTO userDto, MultipartFile photo) {
+    public UserDTO createUser(UserDTO userDto, MultipartFile photo) {
+        User user = new User(userDto);
+        // Add roles to user
+        for (String rol : userDto.getRoles()) {
+            Optional<Rol> rolEntity = rolService.getRol(rol);
+            if(rolEntity.isEmpty()) throw new OperationException(404, "Rol not found");
+            user.getRoles().add(rolEntity.get());
+        }
+
+        // Update claims
+        try{
+            firebaseService.updateCustomClaims(user.getIdUser(), userDto.getRoles());
+        } catch (FirebaseAuthException e) {
+            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+        }
+
+        // Upload photo to firebase
+        if (photo != null) {
+            String photoName = user.getIdUser();
+            String extension = FilenameUtils.getExtension(photo.getOriginalFilename());
+            try{
+                user.setPhotoUrl(firebaseService.uploadImg(photoName, extension, photo));
+            } catch (IOException e) {
+                throw new OperationException(500, "Error uploading photo: " + e.getMessage());
+            }
+        }
+        return new UserDTO(userRepository.save(user));
+    }
+
+    public UserDTO createUserFromAdmin(UserCreateDTO userDto, MultipartFile photo) {
         User user = new User(userDto);
 
         // Create user in firebase
         try {
-            user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password()));
+            user.setIdUser(firebaseService.createUser(userDto.mail(), userDto.password(), userDto.roles()));
         } catch (FirebaseAuthException e) {
             throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
         }
@@ -113,6 +144,20 @@ public class UserService {
         }).orElseThrow(() -> new OperationException(404, "User not found"));
     }
 
+    public UserDTO activateUser(String id){
+        return userRepository.findById(id).map(user -> {
+            user.setActive(true);
+            user.setDeleted(null);
+            userRepository.save(user);
+            if (user.getRoles().stream().noneMatch(rol -> rol.getIdRol().equals("guest"))) try {
+                firebaseService.enableUser(user.getIdUser());
+            } catch (FirebaseAuthException e) {
+                throw new OperationException(500, e.getMessage());
+            }
+            return new UserDTO(user);
+        }).orElseThrow(() -> new OperationException(404, "User not found"));
+    }
+
     public UserDTO[] getUsers(String fullname, String username, String mail, String rol, Boolean active) {
         return userRepository.findUsersByFilters(fullname, username, mail, rol, active).stream()
                 .map(user -> user.getActive() ? new UserDTO(user) : new InactiveUserDTO(user))
@@ -165,13 +210,34 @@ public class UserService {
             Rol rolEntity = rolService.getRol(rol).orElseThrow();
             user.getRoles().add(rolEntity);
         }
+
+        // Update custom claims in firebase
+        try {
+            firebaseService.updateCustomClaims(user.getIdUser(), roles);
+        } catch (FirebaseAuthException e) {
+            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+        }
+
         return new UserDTO(userRepository.save(user));
     }
 
-    public UserDTO removeRoles(String id, String rol) {
+    public UserDTO removeRoles(String id, String role) {
         User user = userRepository.findById(id).orElseThrow(() -> new OperationException(404, "User not found"));
-        Rol rolEntity = rolService.getRol(rol).orElseThrow(() -> new OperationException(404, "Rol not found"));
+        Rol rolEntity = rolService.getRol(role).orElseThrow(() -> new OperationException(404, "Rol not found"));
         user.getRoles().remove(rolEntity);
-        return new UserDTO(userRepository.save(user));
+        user = userRepository.save(user);
+
+        // Update custom claims in firebase
+        String[] roles = user.getRoles().stream()
+                .map(Rol::getIdRol)
+                .toArray(String[]::new);
+
+        try {
+            firebaseService.updateCustomClaims(user.getIdUser(), roles);
+        } catch (FirebaseAuthException e) {
+            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+        }
+
+        return new UserDTO(user);
     }
 }
