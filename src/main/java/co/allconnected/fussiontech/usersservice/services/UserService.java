@@ -47,6 +47,13 @@ public class UserService {
             user.getRoles().add(rolEntity.get());
         }
 
+        // Update claims
+        try{
+            firebaseService.updateCustomClaims(user.getIdUser(), userDto.getRoles());
+        } catch (FirebaseAuthException e) {
+            throw new OperationException(500, "Firebase authentication error: " + e.getMessage());
+        }
+
         // Upload photo to firebase
         if (photo != null) {
             String photoName = user.getIdUser();
