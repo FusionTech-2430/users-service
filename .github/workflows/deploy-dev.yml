@@ -1,0 +1,36 @@
+name: Deploy Develop
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+  workflow_dispatch:
+jobs:
+  Deploy:
+    name: Deploy on Develop
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: self-hosted
+    steps:
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.HOSTS_USERNAME }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd AllConnected/${{ github.event.repository.name }}
+            echo "Fetching latest code..."
+            git fetch
+            git checkout develop
+            git pull
+            echo "Building Docker image..."
+            docker build -t ${{ github.event.repository.name }} .
+            echo "Creating .env file..."
+            echo "PROFILE=dev" >> .env
+            echo "CONFIG_IP=10.43.101.114" >> .env
+            docker rm -f ${{ github.event.repository.name }}
+            docker run --name ${{ github.event.repository.name }} --network all_connected -d -p ${{ secrets.SERVICE_PORT }}:8080 --env-file .env ${{ github.event.repository.name }}
+            echo "Docker container running..."
+            rm .env
